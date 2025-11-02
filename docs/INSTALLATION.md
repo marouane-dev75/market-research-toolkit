@@ -16,7 +16,7 @@ This guide provides detailed installation instructions for the Ticker Analysis T
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/marouane-dev75/market-research-toolkit
    cd ticker_analysis
    ```
 
@@ -34,7 +34,7 @@ This guide provides detailed installation instructions for the Ticker Analysis T
 
 1. **Clone and navigate**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/marouane-dev75/market-research-toolkit
    cd ticker_analysis
    ```
 
@@ -66,7 +66,7 @@ For contributors and developers:
 
 1. **Clone repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/marouane-dev75/market-research-toolkit
    cd ticker_analysis
    ```
 

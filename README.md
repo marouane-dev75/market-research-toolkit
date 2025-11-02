@@ -45,7 +45,7 @@ A comprehensive financial analysis tool for stock market research, screening, an
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/marouane-dev75/market-research-toolkit
    cd ticker_analysis
    ```
 
