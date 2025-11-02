@@ -1,287 +1,247 @@
-# Ticker Analysis Tool
+# Market Research Toolkit
 
-A comprehensive financial analysis tool for stock market research, screening, and monitoring. This Python application provides detailed company analysis, technical indicators, Magic Formula screening, and real-time price monitoring with notifications.
+A comprehensive Python-based financial analysis tool for stock market research and ticker analysis. This toolkit provides command-line interfaces for fetching, analyzing, and monitoring financial data from various sources.
 
 ## 🚀 Features
 
-### 📊 Comprehensive Analysis
-- **Company Information**: Basic info, market data, valuation metrics
-- **Financial Statement Analysis**: Income statement, balance sheet, and cash flow analysis
-- **Technical Analysis**: MACD, RSI, Moving Averages, Bollinger Bands with scoring
-- **Price Analysis**: Multi-timeframe price movements and volume analysis
-- **Dividend Analysis**: Historical dividend trends and statistics
-
-### 🔍 Magic Formula Screening
-- Implementation of Joel Greenblatt's Magic Formula from "The Little Book That Beats the Market"
-- Ranks stocks by Earnings Yield and Return on Capital
-- Supports both quarterly and yearly data analysis
-- Batch processing of multiple tickers
-
-### 📈 Price Monitoring & Alerts
-- Real-time price threshold monitoring
-- Telegram notifications for triggered alerts
-- Configurable thresholds with multiple operators (>, <, =, >=, <=)
-- Support for multiple notification providers
-
-### ⚡ Performance & Caching
-- Intelligent caching system with configurable TTL
-- Optimized data fetching from Yahoo Finance
-- Concurrent processing for multiple tickers
-
-### 🎨 Rich Console Output
-- Professional formatting with colors and structured display
-- Detailed help system for all commands
-- Progress indicators and status messages
+- **Comprehensive Financial Analysis**: Complete company analysis including financial statements, ratios, and key metrics
+- **Magic Formula Screening**: Implementation of Joel Greenblatt's Magic Formula for stock screening
+- **Financial Statements**: Access to income statements, balance sheets, and cash flow statements
+- **Price Monitoring**: Real-time price alerts and threshold monitoring
+- **Dividend Analysis**: Historical dividend data and analysis
+- **Caching System**: Intelligent caching to reduce API calls and improve performance
+- **Telegram Notifications**: Real-time alerts via Telegram bot integration
+- **Rich Console Output**: Beautiful, formatted output with colors and tables
 
 ## 📋 Requirements
 
 - Python 3.8+
-- Internet connection for financial data fetching
-- Optional: Telegram Bot Token for notifications
+- Virtual environment (recommended)
 
 ## 🛠️ Installation
 
-### Quick Start
-
-1. **Clone the repository**
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/marouane-dev75/market-research-toolkit
-   cd ticker_analysis
+   git clone https://github.com/marouane-dev75/market-research-toolkit.git
+   cd market-research-toolkit
    ```
 
-2. **Install dependencies**
+2. **Create and activate a virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Run your first analysis**
+## 🚀 Quick Start
+
+### Basic Usage
+
+Run the main script to see available commands:
+```bash
+python main.py --help
+```
+
+### Example Commands
+
+1. **Get comprehensive company analysis**:
    ```bash
    python main.py analysis AAPL
    ```
 
-## 🚀 Quick Start Guide
+2. **View financial statements**:
+   ```bash
+   python main.py income MSFT
+   python main.py balance GOOGL yearly
+   python main.py cashflow TSLA
+   ```
 
-### Basic Company Analysis
+3. **Magic Formula screening**:
+   ```bash
+   python main.py magic AAPL,GOOGL,MSFT,NVDA,TSLA
+   ```
+
+4. **Price monitoring**:
+   ```bash
+   python main.py price AAPL
+   python main.py monitor --status
+   ```
+
+5. **Company information**:
+   ```bash
+   python main.py info NVDA
+   ```
+
+## 📊 Available Commands
+
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `analysis` | `a`, `analyze` | Comprehensive company analysis |
+| `magic` | `mf`, `magic_formula` | Magic Formula stock screening |
+| `income` | `inc` | Income statement data |
+| `balance` | `bal` | Balance sheet data |
+| `cashflow` | `cf` | Cash flow statement data |
+| `dividend` | `div` | Dividend history and analysis |
+| `price` | `p` | Historical price data |
+| `info` | `i` | Company information |
+| `cache` | `c` | Cache management |
+| `monitor` | `m`, `watch`, `alert` | Price monitoring |
+
+### Command Examples
+
 ```bash
-# Comprehensive analysis of Apple Inc.
+# Comprehensive analysis
 python main.py analysis AAPL
+python main.py a GOOGL  # Using alias
 
-# Quick aliases
-python main.py a MSFT
-python main.py analyze GOOGL
-```
+# Financial statements with different frequencies
+python main.py income MSFT yearly
+python main.py balance AAPL quarterly
+python main.py cashflow TSLA
 
-### Magic Formula Screening
-```bash
-# Screen multiple stocks using Magic Formula
-python main.py magic AAPL,MSFT,GOOGL,TSLA
+# Magic Formula screening
+python main.py magic AAPL,GOOGL,MSFT
+python main.py mf AAPL,GOOGL yearly
 
-# Use yearly data instead of quarterly
-python main.py magic AAPL,MSFT,GOOGL yearly
+# Price and dividend data
+python main.py price NVDA
+python main.py dividend AAPL
 
-# Quick alias
-python main.py mf JPM,BAC,WFC,C
-```
-
-### Individual Analysis Commands
-```bash
-# Income statement analysis
-python main.py income AAPL quarterly
-
-# Balance sheet analysis
-python main.py balance MSFT yearly
-
-# Cash flow analysis
-python main.py cashflow GOOGL
-
-# Dividend analysis
-python main.py dividend KO
-
-# Price analysis with technical indicators
-python main.py price TSLA
-```
-
-### Price Monitoring
-```bash
-# Run monitoring check
-python main.py monitor
-```
-
-### Cache Management
-```bash
-# Clear all cache
-python main.py cache clear
-
-# Show cache status
+# Cache management
 python main.py cache status
-
-# Clear specific ticker cache
 python main.py cache clear AAPL
+python main.py cache clear  # Clear all
+
+# Monitoring
+python main.py monitor --status
+python main.py monitor --test
 ```
 
 ## ⚙️ Configuration
 
-### Basic Configuration
+The application uses a YAML configuration file located at [`src/ticker_analysis/config/config.yml`](src/ticker_analysis/config/config.yml). Key configuration options include:
 
-The application uses a YAML configuration file located at [`config/config.yml`](config/config.yml). Key settings include:
-
+### Application Settings
 ```yaml
-# Application Settings
 application:
   name: "Ticker Analysis Tool"
   version: "1.0.0"
+  default_output_format: "console"
   debug_mode: false
+```
 
-# Data Caching (TTL in hours)
+### Cache Configuration
+```yaml
 data:
-  cache_directory: "data"
+  cache_directory: "cache_data"
   cache:
     company_info:
       ttl_hours: 168  # 1 week
+      enabled: true
     price_data:
       ttl_hours: 24   # 1 day
+      enabled: true
+```
 
-# Telegram Notifications
+### Telegram Notifications
+```yaml
 telegram:
   enabled: true
   bot_token: "YOUR_BOT_TOKEN_HERE"
   chat_id: "YOUR_CHAT_ID_HERE"
+  timeout_seconds: 30
+  retry_attempts: 3
+```
 
-# Price Monitoring
+### Price Monitoring
+```yaml
 price_monitor:
   enabled: true
   thresholds:
     - "AAPL:gt:150"    # Alert when Apple > $150
     - "MSFT:lt:300"    # Alert when Microsoft < $300
+    - "GOOGL:gte:2500" # Alert when Google >= $2500
 ```
 
-### Setting up Telegram Notifications
+## 🔧 Setting Up Telegram Notifications
 
-1. **Create a Telegram Bot**
+1. **Create a Telegram Bot**:
    - Open Telegram and search for `@BotFather`
    - Send `/newbot` and follow instructions
    - Copy the bot token
 
-2. **Get your Chat ID**
+2. **Get Your Chat ID**:
    - Start a chat with your bot
    - Send any message
    - Visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
    - Find your chat ID in the response
 
-3. **Update Configuration**
-   ```yaml
-   telegram:
-     enabled: true
-     bot_token: "your_actual_bot_token"
-     chat_id: "your_actual_chat_id"
-   ```
+3. **Update Configuration**:
+   - Edit [`src/ticker_analysis/config/config.yml`](src/ticker_analysis/config/config.yml)
+   - Replace `YOUR_BOT_TOKEN_HERE` and `YOUR_CHAT_ID_HERE`
 
-### Price Monitoring Setup
+## 🧪 Testing
 
-Configure price thresholds in [`config/config.yml`](config/config.yml):
-
-```yaml
-price_monitor:
-  enabled: true
-  thresholds:
-    # Format: "TICKER:OPERATOR:VALUE"
-    - "AAPL:gt:150"     # Apple > $150
-    - "MSFT:lt:300"     # Microsoft < $300
-    - "GOOGL:gte:2500"  # Google >= $2500
-    - "TSLA:lte:200"    # Tesla <= $200
-    - "NVDA:eq:500"     # NVIDIA = $500
-```
-
-**Supported Operators:**
-- `gt`: Greater than (>)
-- `lt`: Less than (<)
-- `gte`: Greater than or equal (>=)
-- `lte`: Less than or equal (<=)
-- `eq`: Equal (=)
-
-## 📚 Available Commands
-
-| Command    | Aliases               | Description                    |
-| ---------- | --------------------- | ------------------------------ |
-| `analysis` | `a`, `analyze`        | Comprehensive company analysis |
-| `magic`    | `mf`, `magic_formula` | Magic Formula stock screening  |
-| `income`   | `inc`                 | Income statement analysis      |
-| `balance`  | `bal`                 | Balance sheet analysis         |
-| `cashflow` | `cf`                  | Cash flow analysis             |
-| `dividend` | `div`                 | Dividend analysis              |
-| `price`    | `p`                   | Price and technical analysis   |
-| `info`     | `i`                   | Basic company information      |
-| `monitor`  | `m`, `watch`, `alert` | Price monitoring               |
-| `cache`    | `c`                   | Cache management               |
-
-### Getting Help
+Run the comprehensive integration test:
 
 ```bash
-# General help
-python main.py --help
+# Activate virtual environment first
+source venv/bin/activate
 
-# Command-specific help
-python main.py analysis --help
-python main.py magic --help
-python main.py monitor --help
+# Run integration tests
+python tests/test_integration_global.py
 ```
 
-## 📊 Output Examples
+The test suite validates all CLI commands with test tickers: AAPL, GOOGL, MSFT, NVDA, TSLA.
 
-### Company Analysis Output
-```
-=== APPLE INC (AAPL) ===
-
-📊 MARKET DATA
-• Current Price: $175.43 (+2.34%)
-• Market Cap: $2.75T
-• 52-Week Range: $124.17 - $198.23
-
-📈 TECHNICAL ANALYSIS
-• RSI (14): 67.2 (Neutral)
-• MACD: Bullish Signal
-• Overall Score: 7.2/10 (BUY)
-
-💰 FINANCIAL HEALTH
-• Revenue Growth (3Y): 8.2%
-• Profit Margin: 25.3%
-• ROE: 147.4%
-• Debt-to-Equity: 1.73
-```
-
-### Magic Formula Screening Output
-```
-=== MAGIC FORMULA SCREENING RESULTS ===
-
-📊 RANKED STOCKS (Quarterly Data)
-┌──────┬────────┬─────────────────────┬────────┬────────┬─────────┬──────────┬───────┐
-│ Rank │ Ticker │ Company             │ EY     │ ROC    │ EY Rank │ ROC Rank │ Score │
-├──────┼────────┼─────────────────────┼────────┼────────┼─────────┼──────────┼───────┤
-│ 1    │ AAPL   │ Apple Inc.          │ 3.2%   │ 147.4% │ 3       │ 1        │ 4     │
-│ 2    │ MSFT   │ Microsoft Corp.     │ 3.8%   │ 45.2%  │ 1       │ 2        │ 3     │
-│ 3    │ GOOGL  │ Alphabet Inc.       │ 3.5%   │ 29.1%  │ 2       │ 3        │ 5     │
-└──────┴────────┴─────────────────────┴────────┴────────┴─────────┴──────────┴───────┘
-```
-
-## 🏗️ Architecture
-
-The application follows a clean architecture pattern with clear separation of concerns:
+## 📁 Project Structure
 
 ```
-├── src/ticker_analysis/
-│   ├── core/                    # Business logic
-│   │   ├── analysis/            # Analysis engines
-│   │   ├── data/                # Data fetching
-│   │   └── screening/           # Screening algorithms
-│   ├── infrastructure/          # Supporting services
-│   │   ├── cache/               # Caching system
-│   │   ├── notifications/       # Notification providers
-│   │   └── monitoring/          # Price monitoring
-│   ├── interfaces/              # User interfaces
-│   │   ├── cli/                 # Command-line interface
-│   │   └── console/             # Output formatting
-│   └── config/                  # Configuration
+market-research-toolkit/
+├── main.py                          # Main entry point
+├── requirements.txt                 # Python dependencies
+├── src/ticker_analysis/            # Main package
+│   ├── config/                     # Configuration management
+│   ├── core/                       # Core business logic
+│   │   ├── analysis/              # Financial analysis modules
+│   │   ├── data/                  # Data fetchers and models
+│   │   └── screening/             # Stock screening algorithms
+│   ├── infrastructure/            # Infrastructure services
+│   │   ├── cache/                 # Caching system
+│   │   ├── monitoring/            # Price monitoring
+│   │   └── notifications/         # Notification providers
+│   └── interfaces/                # User interfaces
+│       ├── cli/                   # Command-line interface
+│       └── console/               # Console formatting
+└── tests/                         # Test suites
 ```
+
+## 🔍 Core Features
+
+### Financial Analysis
+- **Company Analysis**: Comprehensive financial metrics and ratios
+- **Financial Statements**: Income statements, balance sheets, cash flows
+- **Technical Analysis**: Price trends and technical indicators
+- **Dividend Analysis**: Dividend history, yield calculations, and trends
+
+### Stock Screening
+- **Magic Formula**: Joel Greenblatt's proven stock screening methodology
+- **Custom Metrics**: Earnings yield and return on invested capital
+- **Ranking System**: Automated ranking based on Magic Formula criteria
+
+### Data Management
+- **Intelligent Caching**: Configurable TTL for different data types
+- **Multiple Data Sources**: Integration with Yahoo Finance and other providers
+- **Data Validation**: Robust error handling and data validation
+
+### Monitoring & Alerts
+- **Price Thresholds**: Configurable price alerts with multiple operators
+- **Real-time Notifications**: Telegram integration for instant alerts
+- **Monitoring Dashboard**: Status monitoring and configuration testing
 
 ## 🤝 Contributing
 
@@ -291,29 +251,19 @@ The application follows a clean architecture pattern with clear separation of co
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Development Guidelines
+## 📝 License
 
-- Follow PEP 8 style guidelines
-- Add tests for new features
-- Update documentation for API changes
-- Use type hints where appropriate
+This project is licensed under the MIT License.
 
-## 📄 License
+## 🆘 Support
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+For support, please:
+1. Check the documentation and examples above
+2. Run commands with `--help` flag for detailed usage
+3. Enable debug mode with `--debug` flag for troubleshooting
+4. Open an issue on GitHub for bugs or feature requests
 
-## 🙏 Acknowledgments
+## 🔗 Links
 
-- **Joel Greenblatt** - Magic Formula methodology from "The Little Book That Beats the Market"
-- **Yahoo Finance** - Financial data source via yfinance library
-- **Rich Library** - Beautiful console output formatting
-
-## 📞 Support
-
-- **Issues**: Report bugs and request features via GitHub Issues
-- **Documentation**: Comprehensive docs available in the [`docs/`](docs/) directory
-- **Examples**: Usage examples in the [`examples/`](examples/) directory
-
----
-
-**Happy Analyzing! 📈**
+- **Repository**: [https://github.com/marouane-dev75/market-research-toolkit](https://github.com/marouane-dev75/market-research-toolkit)
+- **Issues**: [https://github.com/marouane-dev75/market-research-toolkit/issues](https://github.com/marouane-dev75/market-research-toolkit/issues)
