@@ -8,6 +8,7 @@ from typing import List
 from .base import BaseCommand
 from ....core.data.fetchers import CompanyInfoFetcher, DividendFetcher, IncomeStatementFetcher, BalanceSheetFetcher, CashFlowFetcher, PriceFetcher, DataFrequency, TimePeriod
 from ....core.analysis.formatter import display_comprehensive_analysis
+from ....core.analysis.pdf import PDFFormatter
 from ....core.analysis.models import CompanyAnalysisData
 from ....core.analysis.dividend import DividendAnalyzer
 from ....core.analysis.income_statement import CompanyIncomeStatementAnalyzer
@@ -38,24 +39,35 @@ class AnalysisCommand(BaseCommand):
     @property
     def usage(self) -> str:
         """Return command usage string."""
-        return f"python main.py {self.name} <TICKER>\n" \
-               f"       TICKER: Stock ticker symbol (e.g., AAPL, MSFT, VNQ)"
+        return f"python main.py {self.name} <TICKER> [--pdf FILENAME]\n" \
+               f"       TICKER: Stock ticker symbol (e.g., AAPL, MSFT, VNQ)\n" \
+               f"       --pdf FILENAME: Optional PDF output file (e.g., --pdf analysis.pdf)"
 
     def validate_args(self, args: List[str]) -> bool:
         """
         Validate command arguments.
 
         Args:
-            args: Command line arguments [ticker]
+            args: Command line arguments [ticker, --pdf, filename]
 
         Returns:
             True if arguments are valid, False otherwise
         """
         if len(args) < 1:
             self.logger.error("Missing required ticker argument")
-            self.logger.info("Usage: python main.py analysis <TICKER>")
+            self.logger.info("Usage: python main.py analysis <TICKER> [--pdf FILENAME]")
             self.logger.info("Example: python main.py analysis AAPL")
+            self.logger.info("Example: python main.py analysis AAPL --pdf analysis.pdf")
             return False
+
+        # Check for --pdf option
+        if "--pdf" in args:
+            pdf_index = args.index("--pdf")
+            if pdf_index + 1 >= len(args):
+                self.logger.error("Missing filename after --pdf option")
+                self.logger.info("Usage: python main.py analysis <TICKER> --pdf <FILENAME>")
+                self.logger.info("Example: python main.py analysis AAPL --pdf analysis.pdf")
+                return False
 
         return True
 
@@ -75,8 +87,16 @@ class AnalysisCommand(BaseCommand):
 
         # Parse arguments
         ticker_symbol = args[0].upper()
+        pdf_filename = None
+
+        # Check for PDF option
+        if "--pdf" in args:
+            pdf_index = args.index("--pdf")
+            pdf_filename = args[pdf_index + 1]
 
         self.logger.info(f"Fetching comprehensive analysis for {ticker_symbol}...")
+        if pdf_filename:
+            self.logger.info(f"PDF output will be saved to: {pdf_filename}")
 
         try:
             # Create fetchers and analyzers
@@ -276,8 +296,18 @@ class AnalysisCommand(BaseCommand):
                 technical_analysis
             )
             
-            # Display the comprehensive analysis using the formatter
-            display_comprehensive_analysis(analysis_data)
+            # Display the comprehensive analysis or generate PDF
+            if pdf_filename:
+                try:
+                    self.logger.info(f"Generating PDF report: {pdf_filename}")
+                    pdf_formatter = PDFFormatter()
+                    pdf_formatter.generate_pdf(analysis_data, pdf_filename)
+                    self.logger.success(f"PDF report saved to: {pdf_filename}")
+                except Exception as e:
+                    return self.handle_error(f"Failed to generate PDF: {str(e)}", exit_code=1)
+            else:
+                # Display the comprehensive analysis using the console formatter
+                display_comprehensive_analysis(analysis_data)
 
             return self.handle_success(f"Successfully processed analysis command for {ticker_symbol}")
 
@@ -317,6 +347,7 @@ class AnalysisCommand(BaseCommand):
 
         self.logger.print_section("ARGUMENTS")
         self.logger.print_bullet("TICKER: Stock ticker symbol (e.g., AAPL, MSFT, VNQ)")
+        self.logger.print_bullet("--pdf FILENAME: Optional PDF output file (e.g., --pdf analysis.pdf)")
 
         if self.aliases:
             self.logger.print_section("ALIASES")
@@ -325,9 +356,9 @@ class AnalysisCommand(BaseCommand):
 
         self.logger.print_section("EXAMPLES")
         self.logger.print_example("python main.py analysis AAPL")
-        self.logger.print_example("python main.py analysis MSFT")
+        self.logger.print_example("python main.py analysis MSFT --pdf msft_analysis.pdf")
         self.logger.print_example("python main.py a TSLA")
-        self.logger.print_example("python main.py analyze SPY")
+        self.logger.print_example("python main.py analyze SPY --pdf spy_report.pdf")
 
         self.logger.print_section("OUTPUT SECTIONS")
         self.logger.print_bullet("Basic Information: Symbol and exchange")
