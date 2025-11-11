@@ -7,7 +7,7 @@ and sends notifications when thresholds are triggered.
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.infrastructure.monitoring.manager import get_price_monitor_manager
+from ....infrastructure.monitoring.manager import get_price_monitor_manager
 
 
 class MonitorCommand(BaseCommand):

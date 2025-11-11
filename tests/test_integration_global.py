@@ -195,20 +195,20 @@ class GlobalIntegrationTest:
     def test_cache_commands(self):
         """Test cache management commands."""
         print("\n=== Testing Cache Commands ===")
-        exit_code = self.run_command(["cache", "status"], "cache status")
-        self.assert_success(exit_code, "Cache status command")
-        
+        exit_code = self.run_command(["cache", "stats"], "cache stats")
+        self.assert_success(exit_code, "Cache stats command")
+
         exit_code = self.run_command(["cache", "clear", "AAPL"], "cache clear AAPL")
         self.assert_success(exit_code, "Cache clear for AAPL")
-        
+
         exit_code = self.run_command(["cache", "clear"], "cache clear all")
         self.assert_success(exit_code, "Cache clear all")
     
     def test_cache_command_alias(self):
         """Test cache command alias."""
         print("\n=== Testing Cache Command Alias ===")
-        exit_code = self.run_command(["c", "status"], "cache alias 'c'")
-        self.assert_success(exit_code, "Cache alias 'c' status")
+        exit_code = self.run_command(["c", "stats"], "cache alias 'c'")
+        self.assert_success(exit_code, "Cache alias 'c' stats")
     
     def test_monitor_commands(self):
         """Test monitoring commands."""
@@ -272,7 +272,7 @@ class GlobalIntegrationTest:
             (["balance", ticker], f"Workflow: balance {ticker}"),
             (["cashflow", ticker], f"Workflow: cashflow {ticker}"),
             (["magic", f"{ticker},GOOGL"], "Workflow: magic formula"),
-            (["cache", "status"], "Workflow: cache status"),
+            (["cache", "stats"], "Workflow: cache stats"),
         ]
         
         for command_args, description in workflow_steps:

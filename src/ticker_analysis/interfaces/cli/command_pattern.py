@@ -121,31 +121,36 @@ class CommandInvoker:
     def execute_command(self, command_name: str, args: List[str]) -> int:
         """
         Execute a command by name.
-        
+
         Args:
             command_name: Name of the command to execute
             args: Command arguments
-            
+
         Returns:
             Exit code from command execution
         """
         # Get the command
         command = self.registry.get_command(command_name)
-        
+
         if command is None:
             return self._handle_unknown_command(command_name)
-        
+
+        # Check for help flags
+        if "--help" in args or "-h" in args:
+            command.show_help()
+            return 0
+
         try:
             # Validate arguments
             if not command.validate_args(args):
                 self.logger.error(f"Invalid arguments for command '{command_name}'")
                 command.show_help()
                 return 1
-            
+
             # Execute the command
             self.logger.debug(f"Executing command: {command_name}")
             return command.execute(args)
-            
+
         except Exception as e:
             self.logger.error(f"Error executing command '{command_name}': {str(e)}")
             return 1

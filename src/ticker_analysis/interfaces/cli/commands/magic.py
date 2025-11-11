@@ -7,8 +7,8 @@ to screen and rank stocks based on earnings yield and return on capital.
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.core.screening.magic_formula import MagicFormulaFetcher, display_magic_formula_results
-from src.ticker_analysis.core.data.fetchers import DataFrequency
+from ....core.screening.magic_formula import MagicFormulaFetcher, display_magic_formula_results
+from ....core.data.fetchers import DataFrequency
 
 
 class MagicCommand(BaseCommand):

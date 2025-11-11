@@ -6,7 +6,7 @@ This command fetches and displays balance sheet data for a given ticker.
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.core.data.fetchers import (
+from ....core.data.fetchers import (
     BalanceSheetFetcher,
     DataFrequency,
     display_balance_sheet
@@ -34,34 +34,35 @@ class BalanceCommand(BaseCommand):
     @property
     def usage(self) -> str:
         """Return command usage string."""
-        return f"python main.py {self.name} <TICKER> <FREQUENCY>\n" \
+        return f"python main.py {self.name} <TICKER> [FREQUENCY]\n" \
                f"       TICKER: Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)\n" \
-               f"       FREQUENCY: 'yearly' or 'quarterly' (can also use 'year', 'quarter', 'y', 'q')"
+               f"       FREQUENCY: 'yearly' or 'quarterly' (can also use 'year', 'quarter', 'y', 'q') - defaults to 'yearly'"
 
     def validate_args(self, args: List[str]) -> bool:
         """
         Validate command arguments.
 
         Args:
-            args: Command line arguments [ticker, frequency]
+            args: Command line arguments [ticker, optional frequency]
 
         Returns:
             True if arguments are valid, False otherwise
         """
-        if len(args) < 2:
-            self.logger.error("Missing required arguments")
-            self.logger.info("Usage: python main.py balance <TICKER> <FREQUENCY>")
+        if len(args) < 1:
+            self.logger.error("Missing required ticker argument")
+            self.logger.info("Usage: python main.py balance <TICKER> [FREQUENCY]")
             self.logger.info("Example: python main.py balance AAPL yearly")
             return False
 
-        # Validate frequency argument
-        frequency_arg = args[1].lower()
-        valid_frequencies = ['yearly', 'quarterly', 'year', 'quarter', 'y', 'q']
+        # Validate frequency argument if provided
+        if len(args) > 1:
+            frequency_arg = args[1].lower()
+            valid_frequencies = ['yearly', 'quarterly', 'year', 'quarter', 'y', 'q']
 
-        if frequency_arg not in valid_frequencies:
-            self.logger.error(f"Invalid frequency: {args[1]}")
-            self.logger.info(f"Valid frequencies: {', '.join(valid_frequencies)}")
-            return False
+            if frequency_arg not in valid_frequencies:
+                self.logger.error(f"Invalid frequency: {args[1]}")
+                self.logger.info(f"Valid frequencies: {', '.join(valid_frequencies)}")
+                return False
 
         return True
 
@@ -70,7 +71,7 @@ class BalanceCommand(BaseCommand):
         Execute the balance sheet command.
 
         Args:
-            args: Command line arguments [ticker, frequency]
+            args: Command line arguments [ticker, optional frequency]
 
         Returns:
             Exit code (0 for success, non-zero for error)
@@ -81,7 +82,7 @@ class BalanceCommand(BaseCommand):
 
         # Parse arguments
         ticker_symbol = args[0].upper()
-        frequency_arg = args[1].lower()
+        frequency_arg = args[1].lower() if len(args) > 1 else "yearly"
 
         # Map frequency argument to DataFrequency enum
         frequency = self._parse_frequency(frequency_arg)
@@ -153,7 +154,7 @@ class BalanceCommand(BaseCommand):
 
         self.logger.print_section("ARGUMENTS")
         self.logger.print_bullet("TICKER: Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)")
-        self.logger.print_bullet("FREQUENCY: Data frequency - 'yearly', 'quarterly', 'year', 'quarter', 'y', or 'q'")
+        self.logger.print_bullet("FREQUENCY: Optional data frequency - 'yearly', 'quarterly', 'year', 'quarter', 'y', or 'q' (defaults to 'yearly')")
 
         if self.aliases:
             self.logger.print_section("ALIASES")

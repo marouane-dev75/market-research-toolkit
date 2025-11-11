@@ -6,7 +6,7 @@ This command fetches and displays dividend data for a given ticker.
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.core.data.fetchers import (
+from ....core.data.fetchers import (
     DividendFetcher,
     display_dividends
 )
@@ -95,10 +95,8 @@ class DividendCommand(BaseCommand):
 
             # Check if we got any data
             if not dividends:
-                return self.handle_error(
-                    f"No dividend data found for {ticker_symbol}",
-                    exit_code=1
-                )
+                self.logger.info(f"No dividend payments found for {ticker_symbol} (this is normal for non-dividend paying stocks)")
+                return self.handle_success(f"No dividends found for {ticker_symbol}")
 
             self.logger.success(f"Retrieved {len(dividends)} dividend payment(s)")
             self.logger.info("")  # Blank line for spacing
@@ -109,7 +107,12 @@ class DividendCommand(BaseCommand):
             return self.handle_success()
 
         except ValueError as e:
-            return self.handle_error(str(e), exit_code=1)
+            # Handle the case where no dividend data is available (e.g., TSLA)
+            if "No dividend data available" in str(e):
+                self.logger.info(f"No dividend payments found for {ticker_symbol} (this is normal for non-dividend paying stocks)")
+                return self.handle_success(f"No dividends found for {ticker_symbol}")
+            else:
+                return self.handle_error(str(e), exit_code=1)
 
         except Exception as e:
             return self.handle_error(

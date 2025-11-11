@@ -6,7 +6,7 @@ This command fetches and displays comprehensive company information for a given 
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.core.data.fetchers import (
+from ....core.data.fetchers import (
     CompanyInfoFetcher,
     display_company_info
 )

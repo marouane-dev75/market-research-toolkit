@@ -6,7 +6,7 @@ This command fetches and displays historical price data for a given ticker.
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.core.data.fetchers import (
+from ....core.data.fetchers import (
     PriceFetcher,
     TimePeriod,
     display_price_data,
@@ -35,34 +35,35 @@ class PriceCommand(BaseCommand):
     @property
     def usage(self) -> str:
         """Return command usage string."""
-        return f"python main.py {self.name} <TICKER> <PERIOD>\n" \
+        return f"python main.py {self.name} <TICKER> [PERIOD]\n" \
                f"       TICKER: Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)\n" \
-               f"       PERIOD: Time period - '1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'"
+               f"       PERIOD: Time period - '1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max' - defaults to '1y'"
 
     def validate_args(self, args: List[str]) -> bool:
         """
         Validate command arguments.
 
         Args:
-            args: Command line arguments [ticker, period]
+            args: Command line arguments [ticker, optional period]
 
         Returns:
             True if arguments are valid, False otherwise
         """
-        if len(args) < 2:
-            self.logger.error("Missing required arguments")
-            self.logger.info("Usage: python main.py price <TICKER> <PERIOD>")
+        if len(args) < 1:
+            self.logger.error("Missing required ticker argument")
+            self.logger.info("Usage: python main.py price <TICKER> [PERIOD]")
             self.logger.info("Example: python main.py price AAPL 1y")
             return False
 
-        # Validate period argument
-        period_arg = args[1].lower()
-        valid_periods = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max']
+        # Validate period argument if provided
+        if len(args) > 1:
+            period_arg = args[1].lower()
+            valid_periods = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max']
 
-        if period_arg not in valid_periods:
-            self.logger.error(f"Invalid period: {args[1]}")
-            self.logger.info(f"Valid periods: {', '.join(valid_periods)}")
-            return False
+            if period_arg not in valid_periods:
+                self.logger.error(f"Invalid period: {args[1]}")
+                self.logger.info(f"Valid periods: {', '.join(valid_periods)}")
+                return False
 
         return True
 
@@ -71,7 +72,7 @@ class PriceCommand(BaseCommand):
         Execute the price command.
 
         Args:
-            args: Command line arguments [ticker, period]
+            args: Command line arguments [ticker, optional period]
 
         Returns:
             Exit code (0 for success, non-zero for error)
@@ -82,7 +83,7 @@ class PriceCommand(BaseCommand):
 
         # Parse arguments
         ticker_symbol = args[0].upper()
-        period_arg = args[1].lower()
+        period_arg = args[1].lower() if len(args) > 1 else "1y"
 
         # Map period argument to TimePeriod enum
         period = self._parse_period(period_arg)
@@ -167,7 +168,7 @@ class PriceCommand(BaseCommand):
 
         self.logger.print_section("ARGUMENTS")
         self.logger.print_bullet("TICKER: Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)")
-        self.logger.print_bullet("PERIOD: Time period for historical data")
+        self.logger.print_bullet("PERIOD: Optional time period for historical data (defaults to '1y')")
 
         self.logger.print_section("AVAILABLE PERIODS")
         self.logger.print_bullet("1d - 1 day")

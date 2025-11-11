@@ -7,7 +7,7 @@ cleaning, and configuration display.
 
 from typing import List
 from .base import BaseCommand
-from src.ticker_analysis.infrastructure.cache.manager import get_cache_manager, CacheConfig, CacheUtils
+from ....infrastructure.cache.manager import get_cache_manager, CacheConfig, CacheUtils
 
 
 class CacheCommand(BaseCommand):
