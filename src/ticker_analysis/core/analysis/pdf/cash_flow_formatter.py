@@ -62,11 +62,11 @@ class CashFlowFormatter(BasePDFFormatter):
         elements.append(Spacer(1, 0.05 * inch))
         elements.append(self.create_subsection_header("Core Cash Flow Metrics:"))
         if metrics.operating_cash_flow is not None:
-            ocf_color = self.colors.GREEN if metrics.operating_cash_flow > 0 else self.colors.RED
+            ocf_color = self.colors.SUCCESS_GREEN if metrics.operating_cash_flow > 0 else self.colors.WARNING_RED
             elements.append(self.create_bullet_point(f"  Operating Cash Flow: {self.format_currency(metrics.operating_cash_flow, compact=True)}", ocf_color))
 
         if metrics.free_cash_flow is not None:
-            fcf_color = self.colors.GREEN if metrics.free_cash_flow > 0 else self.colors.RED
+            fcf_color = self.colors.SUCCESS_GREEN if metrics.free_cash_flow > 0 else self.colors.WARNING_RED
             elements.append(self.create_bullet_point(f"  Free Cash Flow: {self.format_currency(metrics.free_cash_flow, compact=True)}", fcf_color))
 
         elements.append(self.create_bullet_point(f"  Investing Cash Flow: {self.format_currency(metrics.investing_cash_flow, compact=True)}"))
@@ -182,7 +182,7 @@ class CashFlowFormatter(BasePDFFormatter):
 
         # Overall cash flow health rating
         if assessment.overall_cash_flow_rating.value != "Insufficient Data":
-            rating_color = self._get_health_rating_color(assessment.overall_cash_flow_rating)
+            rating_color = self.get_health_rating_color(assessment.overall_cash_flow_rating.value)
             elements.append(self.create_bullet_point(f"Overall Cash Flow Health: {assessment.overall_cash_flow_rating.value}", rating_color))
 
             if assessment.overall_cash_flow_score is not None:
@@ -205,7 +205,7 @@ class CashFlowFormatter(BasePDFFormatter):
 
             for name, rating, score in component_ratings:
                 if rating.value != "Insufficient Data":
-                    rating_color = self._get_health_rating_color(rating)
+                    rating_color = self.get_health_rating_color(rating.value)
                     score_text = f" ({score:.1f}/10)" if score is not None else ""
                     elements.append(self.create_bullet_point(f"  {name}: {rating.value}{score_text}", rating_color))
 
@@ -214,13 +214,13 @@ class CashFlowFormatter(BasePDFFormatter):
             elements.append(Spacer(1, 0.05 * inch))
             elements.append(self.create_subsection_header("Cash Flow Strengths:"))
             for strength in assessment.strengths:
-                elements.append(self.create_bullet_point(f"  • {strength}", self.colors.GREEN))
+                elements.append(self.create_bullet_point(f"  • {strength}", self.colors.SUCCESS_GREEN))
 
         if assessment.concerns:
             elements.append(Spacer(1, 0.05 * inch))
             elements.append(self.create_subsection_header("Cash Flow Concerns:"))
             for concern in assessment.concerns:
-                elements.append(self.create_bullet_point(f"  • {concern}", self.colors.RED))
+                elements.append(self.create_bullet_point(f"  • {concern}", self.colors.WARNING_RED))
 
         # Summary
         if assessment.summary:
@@ -230,15 +230,3 @@ class CashFlowFormatter(BasePDFFormatter):
 
         elements.append(Spacer(1, 0.2 * inch))
         return elements
-
-    def _get_health_rating_color(self, rating):
-        """Get color for health rating."""
-        rating_value = rating.value.lower()
-        if "excellent" in rating_value or "good" in rating_value:
-            return self.colors.GREEN
-        elif "fair" in rating_value:
-            return self.colors.YELLOW
-        elif "poor" in rating_value:
-            return self.colors.RED
-        else:
-            return self.colors.BLACK

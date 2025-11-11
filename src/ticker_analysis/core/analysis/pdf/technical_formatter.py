@@ -43,11 +43,11 @@ class TechnicalFormatter(BasePDFFormatter):
         elements.append(self.create_spacing("small"))
 
         if analysis.overall_score is not None:
-            score_color = self._get_technical_score_color(analysis.overall_score)
+            score_color = self.get_score_color(analysis.overall_score)
             elements.append(self.create_metric_display("Technical Score", f"{analysis.overall_score:.1f}/10", score_color))
 
         if analysis.overall_signal:
-            signal_color = self._get_signal_color(analysis.overall_signal)
+            signal_color = self.get_signal_color(analysis.overall_signal.value)
             elements.append(self.create_metric_display("Overall Signal", analysis.overall_signal.value, signal_color))
 
         if analysis.confidence_level is not None:
@@ -87,15 +87,15 @@ class TechnicalFormatter(BasePDFFormatter):
         if macd.signal_line is not None:
             elements.append(self.create_bullet_point(f"  Signal Line: {self.format_ratio(macd.signal_line)}"))
         if macd.histogram is not None:
-            hist_color = self.colors.GREEN if macd.histogram > 0 else self.colors.RED
+            hist_color = self.colors.SUCCESS_GREEN if macd.histogram > 0 else self.colors.WARNING_RED
             elements.append(self.create_bullet_point(f"  Histogram: {self.format_ratio(macd.histogram)}", hist_color))
 
         if macd.signal:
-            signal_color = self._get_signal_color(macd.signal)
+            signal_color = self.get_signal_color(macd.signal.value)
             elements.append(self.create_bullet_point(f"  MACD Signal: {macd.signal.value}", signal_color))
 
         if macd.score is not None:
-            score_color = self._get_technical_score_color(macd.score)
+            score_color = self.get_score_color(macd.score)
             elements.append(self.create_bullet_point(f"  MACD Score: {macd.score:.1f}/10", score_color))
 
         return elements
@@ -108,22 +108,22 @@ class TechnicalFormatter(BasePDFFormatter):
         elements.append(self.create_subsection_header("RSI Analysis:"))
 
         if rsi.rsi_value is not None:
-            rsi_color = self.colors.RED if rsi.is_overbought else self.colors.GREEN if rsi.is_oversold else self.colors.YELLOW
+            rsi_color = self.colors.WARNING_RED if rsi.is_overbought else self.colors.SUCCESS_GREEN if rsi.is_oversold else self.colors.CAUTION_YELLOW
             elements.append(self.create_bullet_point(f"  RSI Value: {rsi.rsi_value:.1f}", rsi_color))
 
         if rsi.is_overbought:
-            elements.append(self.create_bullet_point("  Status: Overbought (>70)", self.colors.RED))
+            elements.append(self.create_bullet_point("  Status: Overbought (>70)", self.colors.WARNING_RED))
         elif rsi.is_oversold:
-            elements.append(self.create_bullet_point("  Status: Oversold (<30)", self.colors.GREEN))
+            elements.append(self.create_bullet_point("  Status: Oversold (<30)", self.colors.SUCCESS_GREEN))
         else:
-            elements.append(self.create_bullet_point("  Status: Normal (30-70)", self.colors.YELLOW))
+            elements.append(self.create_bullet_point("  Status: Normal (30-70)", self.colors.CAUTION_YELLOW))
 
         if rsi.signal:
-            signal_color = self._get_signal_color(rsi.signal)
+            signal_color = self.get_signal_color(rsi.signal.value)
             elements.append(self.create_bullet_point(f"  RSI Signal: {rsi.signal.value}", signal_color))
 
         if rsi.score is not None:
-            score_color = self._get_technical_score_color(rsi.score)
+            score_color = self.get_score_color(rsi.score)
             elements.append(self.create_bullet_point(f"  RSI Score: {rsi.score:.1f}/10", score_color))
 
         return elements
@@ -140,17 +140,17 @@ class TechnicalFormatter(BasePDFFormatter):
 
         if ma.sma_20 is not None:
             price_vs_sma = "Above" if ma.current_price and ma.current_price > ma.sma_20 else "Below"
-            color = self.colors.GREEN if price_vs_sma == "Above" else self.colors.RED
+            color = self.colors.SUCCESS_GREEN if price_vs_sma == "Above" else self.colors.WARNING_RED
             elements.append(self.create_bullet_point(f"  SMA 20: {self.format_currency(ma.sma_20)} ({price_vs_sma})", color))
 
         if ma.sma_50 is not None:
             price_vs_sma = "Above" if ma.current_price and ma.current_price > ma.sma_50 else "Below"
-            color = self.colors.GREEN if price_vs_sma == "Above" else self.colors.RED
+            color = self.colors.SUCCESS_GREEN if price_vs_sma == "Above" else self.colors.WARNING_RED
             elements.append(self.create_bullet_point(f"  SMA 50: {self.format_currency(ma.sma_50)} ({price_vs_sma})", color))
 
         if ma.sma_200 is not None:
             price_vs_sma = "Above" if ma.current_price and ma.current_price > ma.sma_200 else "Below"
-            color = self.colors.GREEN if price_vs_sma == "Above" else self.colors.RED
+            color = self.colors.SUCCESS_GREEN if price_vs_sma == "Above" else self.colors.WARNING_RED
             elements.append(self.create_bullet_point(f"  SMA 200: {self.format_currency(ma.sma_200)} ({price_vs_sma})", color))
 
         if ma.ema_12 is not None:
@@ -160,15 +160,15 @@ class TechnicalFormatter(BasePDFFormatter):
             elements.append(self.create_bullet_point(f"  EMA 26: {self.format_currency(ma.ema_26)}"))
 
         if ma.trend_strength:
-            trend_color = self._get_trend_color(ma.trend_strength)
+            trend_color = self.get_trend_color(ma.trend_strength)
             elements.append(self.create_bullet_point(f"  Trend Strength: {ma.trend_strength}", trend_color))
 
         if ma.signal:
-            signal_color = self._get_signal_color(ma.signal)
+            signal_color = self.get_signal_color(ma.signal.value)
             elements.append(self.create_bullet_point(f"  MA Signal: {ma.signal.value}", signal_color))
 
         if ma.score is not None:
-            score_color = self._get_technical_score_color(ma.score)
+            score_color = self.get_score_color(ma.score)
             elements.append(self.create_bullet_point(f"  MA Score: {ma.score:.1f}/10", score_color))
 
         return elements
@@ -194,54 +194,23 @@ class TechnicalFormatter(BasePDFFormatter):
 
         if bb.percent_b is not None:
             position = "Above Upper" if bb.percent_b > 100 else "Below Lower" if bb.percent_b < 0 else "Within Bands"
-            position_color = self.colors.RED if bb.percent_b > 100 or bb.percent_b < 0 else self.colors.GREEN
+            position_color = self.colors.WARNING_RED if bb.percent_b > 100 or bb.percent_b < 0 else self.colors.SUCCESS_GREEN
             elements.append(self.create_bullet_point(f"  %B Position: {bb.percent_b:.1f}% ({position})", position_color))
 
         if bb.bandwidth is not None:
             elements.append(self.create_bullet_point(f"  Bandwidth: {bb.bandwidth:.2f}%"))
 
         if bb.squeeze:
-            elements.append(self.create_bullet_point("  Squeeze: Yes (Low Volatility)", self.colors.YELLOW))
+            elements.append(self.create_bullet_point("  Squeeze: Yes (Low Volatility)", self.colors.CAUTION_YELLOW))
         else:
             elements.append(self.create_bullet_point("  Squeeze: No"))
 
         if bb.signal:
-            signal_color = self._get_signal_color(bb.signal)
+            signal_color = self.get_signal_color(bb.signal.value)
             elements.append(self.create_bullet_point(f"  BB Signal: {bb.signal.value}", signal_color))
 
         if bb.score is not None:
-            score_color = self._get_technical_score_color(bb.score)
+            score_color = self.get_score_color(bb.score)
             elements.append(self.create_bullet_point(f"  BB Score: {bb.score:.1f}/10", score_color))
 
         return elements
-
-    def _get_technical_score_color(self, score: float):
-        """Get color for technical score display."""
-        if score >= 8:
-            return self.colors.GREEN
-        elif score >= 6:
-            return self.colors.GREEN
-        elif score >= 4:
-            return self.colors.YELLOW
-        elif score >= 2:
-            return self.colors.RED
-        else:
-            return self.colors.RED
-
-    def _get_signal_color(self, signal: TechnicalSignal):
-        """Get color for signal display."""
-        if signal in [TechnicalSignal.STRONG_BUY, TechnicalSignal.BUY]:
-            return self.colors.GREEN
-        elif signal in [TechnicalSignal.STRONG_SELL, TechnicalSignal.SELL]:
-            return self.colors.RED
-        else:
-            return self.colors.YELLOW
-
-    def _get_trend_color(self, trend: str):
-        """Get color for trend display."""
-        if "Strong Uptrend" in trend or "Uptrend" in trend:
-            return self.colors.GREEN
-        elif "Strong Downtrend" in trend or "Downtrend" in trend:
-            return self.colors.RED
-        else:
-            return self.colors.YELLOW

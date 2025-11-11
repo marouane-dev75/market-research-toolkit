@@ -25,11 +25,7 @@ class PDFColors:
     CAUTION_YELLOW = colors.Color(0.95, 0.6, 0.1)   # Professional amber
     INFO_BLUE = colors.Color(0.2, 0.4, 0.8)         # Professional blue
 
-    # Legacy aliases for backward compatibility
-    GREEN = SUCCESS_GREEN
-    RED = WARNING_RED
-    YELLOW = CAUTION_YELLOW
-    BLUE = INFO_BLUE
+    # Legacy aliases removed - use descriptive names above
 
     # Text colors
     PRIMARY_TEXT = colors.Color(0.2, 0.2, 0.2)      # Dark gray for better readability
@@ -342,11 +338,95 @@ class BasePDFFormatter:
         good_threshold, bad_threshold = thresholds
 
         if value >= good_threshold:
-            return self.colors.GREEN
+            return self.colors.SUCCESS_GREEN
         elif value <= bad_threshold:
-            return self.colors.RED
+            return self.colors.WARNING_RED
         else:
-            return self.colors.YELLOW
+            return self.colors.CAUTION_YELLOW
+
+    def get_score_color(self, score: float, excellent_threshold: float = 8.0,
+                       good_threshold: float = 6.0, fair_threshold: float = 4.0) -> colors.Color:
+        """
+        Get color for score-based metrics (0-10 scale).
+
+        Args:
+            score: Score value (0-10)
+            excellent_threshold: Threshold for excellent (green)
+            good_threshold: Threshold for good (green)
+            fair_threshold: Threshold for fair (yellow)
+
+        Returns:
+            Color based on score
+        """
+        if score >= excellent_threshold:
+            return self.colors.SUCCESS_GREEN
+        elif score >= good_threshold:
+            return self.colors.SUCCESS_GREEN
+        elif score >= fair_threshold:
+            return self.colors.CAUTION_YELLOW
+        else:
+            return self.colors.WARNING_RED
+
+    def get_signal_color(self, signal_value: str) -> colors.Color:
+        """
+        Get color for signal-based values (buy/sell/hold signals).
+
+        Args:
+            signal_value: Signal string (case-insensitive)
+
+        Returns:
+            Color based on signal type
+        """
+        signal_lower = signal_value.lower() if signal_value else ""
+
+        if any(term in signal_lower for term in ['strong_buy', 'buy', 'bullish']):
+            return self.colors.SUCCESS_GREEN
+        elif any(term in signal_lower for term in ['strong_sell', 'sell', 'bearish']):
+            return self.colors.WARNING_RED
+        else:
+            return self.colors.CAUTION_YELLOW
+
+    def get_trend_color(self, trend_value: str) -> colors.Color:
+        """
+        Get color for trend-based values.
+
+        Args:
+            trend_value: Trend description string
+
+        Returns:
+            Color based on trend direction
+        """
+        trend_lower = trend_value.lower() if trend_value else ""
+
+        if any(term in trend_lower for term in ['strong_uptrend', 'uptrend', 'bullish']):
+            return self.colors.SUCCESS_GREEN
+        elif any(term in trend_lower for term in ['strong_downtrend', 'downtrend', 'bearish']):
+            return self.colors.WARNING_RED
+        else:
+            return self.colors.CAUTION_YELLOW
+
+    def get_health_rating_color(self, rating_value: str) -> colors.Color:
+        """
+        Get color for health rating values.
+
+        Args:
+            rating_value: Health rating string
+
+        Returns:
+            Color based on rating
+        """
+        rating_lower = rating_value.lower() if rating_value else ""
+
+        if 'excellent' in rating_lower:
+            return self.colors.SUCCESS_GREEN
+        elif 'good' in rating_lower:
+            return self.colors.SUCCESS_GREEN
+        elif 'fair' in rating_lower:
+            return self.colors.CAUTION_YELLOW
+        elif any(term in rating_lower for term in ['poor', 'weak', 'insufficient']):
+            return self.colors.WARNING_RED
+        else:
+            return self.colors.PRIMARY_TEXT
 
     def create_section_header(self, title: str) -> Paragraph:
         """
@@ -458,33 +538,7 @@ class BasePDFFormatter:
         height = sizes.get(size, sizes["normal"])
         return Spacer(1, height)
 
-    def create_key_value_pair(self, key: str, value: str, value_color: colors.Color = None) -> Paragraph:
-        """
-        Create a professional key-value pair display.
 
-        Args:
-            key: The label/key text
-            value: The value text
-            value_color: Optional color for the value
-
-        Returns:
-            Paragraph object
-        """
-        if value_color:
-            # Convert RGB values to hex format for HTML
-            r, g, b = int(value_color.red * 255), int(value_color.green * 255), int(value_color.blue * 255)
-            hex_color = f"#{r:02x}{g:02x}{b:02x}"
-            styled_text = f'<b>{key}:</b> <font color="{hex_color}">{value}</font>'
-        else:
-            styled_text = f'<b>{key}:</b> {value}'
-
-        style = ParagraphStyle(
-            name='KeyValuePair',
-            parent=self.styles['CustomNormal'],
-            spaceAfter=6
-        )
-
-        return Paragraph(styled_text, style)
 
     def create_subsection_header(self, text: str) -> Paragraph:
         """
@@ -528,3 +582,35 @@ class BasePDFFormatter:
         )
 
         return Paragraph(styled_text, style)
+
+    def create_standard_section(self, title: str, metrics: List[Tuple[str, str, Optional[colors.Color]]],
+                               subheader: str = None) -> List:
+        """
+        Create a standard section with professional header, optional subheader, and metrics.
+
+        Args:
+            title: Section title
+            metrics: List of (label, value, color) tuples
+            subheader: Optional subheader text
+
+        Returns:
+            List of PDF elements for the section
+        """
+        elements = []
+
+        # Professional section header
+        elements.extend(self.create_professional_section_header(title))
+
+        # Optional subheader
+        if subheader:
+            elements.append(self.create_subheader(subheader))
+            elements.append(self.create_spacing("small"))
+
+        # Add metrics
+        for label, value, color in metrics:
+            elements.append(self.create_metric_display(label, value, color))
+
+        # Add section spacing
+        elements.append(self.create_spacing("section"))
+
+        return elements

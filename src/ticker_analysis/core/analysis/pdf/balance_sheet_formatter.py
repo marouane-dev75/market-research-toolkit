@@ -179,7 +179,7 @@ class BalanceSheetFormatter(BasePDFFormatter):
 
         # Overall balance sheet health rating
         if assessment.overall_balance_sheet_rating.value != "Insufficient Data":
-            rating_color = self._get_health_rating_color(assessment.overall_balance_sheet_rating)
+            rating_color = self.get_health_rating_color(assessment.overall_balance_sheet_rating.value)
             elements.append(self.create_bullet_point(f"Overall Balance Sheet Health: {assessment.overall_balance_sheet_rating.value}", rating_color))
 
             if assessment.overall_balance_sheet_score is not None:
@@ -202,7 +202,7 @@ class BalanceSheetFormatter(BasePDFFormatter):
 
             for name, rating, score in component_ratings:
                 if rating.value != "Insufficient Data":
-                    rating_color = self._get_health_rating_color(rating)
+                    rating_color = self.get_health_rating_color(rating.value)
                     score_text = f" ({score:.1f}/10)" if score is not None else ""
                     elements.append(self.create_bullet_point(f"  {name}: {rating.value}{score_text}", rating_color))
 
@@ -211,13 +211,13 @@ class BalanceSheetFormatter(BasePDFFormatter):
             elements.append(Spacer(1, 0.05 * inch))
             elements.append(self.create_subsection_header("Balance Sheet Strengths:"))
             for strength in assessment.strengths:
-                elements.append(self.create_bullet_point(f"  • {strength}", self.colors.GREEN))
+                elements.append(self.create_bullet_point(f"  • {strength}", self.colors.SUCCESS_GREEN))
 
         if assessment.concerns:
             elements.append(Spacer(1, 0.05 * inch))
             elements.append(self.create_subsection_header("Balance Sheet Concerns:"))
             for concern in assessment.concerns:
-                elements.append(self.create_bullet_point(f"  • {concern}", self.colors.RED))
+                elements.append(self.create_bullet_point(f"  • {concern}", self.colors.WARNING_RED))
 
         # Summary
         if assessment.summary:
@@ -227,15 +227,3 @@ class BalanceSheetFormatter(BasePDFFormatter):
 
         elements.append(Spacer(1, 0.2 * inch))
         return elements
-
-    def _get_health_rating_color(self, rating):
-        """Get color for health rating."""
-        rating_value = rating.value.lower()
-        if "excellent" in rating_value or "good" in rating_value:
-            return self.colors.GREEN
-        elif "fair" in rating_value:
-            return self.colors.YELLOW
-        elif "poor" in rating_value:
-            return self.colors.RED
-        else:
-            return self.colors.BLACK

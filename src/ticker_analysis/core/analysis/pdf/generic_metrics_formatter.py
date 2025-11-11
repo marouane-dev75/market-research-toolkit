@@ -179,7 +179,7 @@ class GenericMetricsFormatter(BasePDFFormatter):
 
         # Daily change
         if analysis.daily_change is not None and analysis.daily_change_percent is not None:
-            change_color = self.colors.GREEN if analysis.daily_change > 0 else self.colors.RED if analysis.daily_change < 0 else self.colors.BLACK
+            change_color = self.colors.SUCCESS_GREEN if analysis.daily_change > 0 else self.colors.WARNING_RED if analysis.daily_change < 0 else self.colors.BLACK
             change_text = f"{self.format_currency(analysis.daily_change, show_sign=True)} ({self.format_percentage(analysis.daily_change_percent, show_sign=True, multiply_by_100=False)})"
             elements.append(self.create_metric_display("Daily Change", change_text, change_color))
 
@@ -194,7 +194,7 @@ class GenericMetricsFormatter(BasePDFFormatter):
         if analysis.average_volume is not None:
             elements.append(self.create_metric_display("Average Volume", self.format_volume(analysis.average_volume)))
         if analysis.volume_ratio is not None:
-            volume_color = self.colors.GREEN if analysis.volume_ratio > 1.5 else self.colors.YELLOW if analysis.volume_ratio > 0.5 else self.colors.RED
+            volume_color = self.colors.SUCCESS_GREEN if analysis.volume_ratio > 1.5 else self.colors.CAUTION_YELLOW if analysis.volume_ratio > 0.5 else self.colors.WARNING_RED
             elements.append(self.create_metric_display("Volume Ratio", f"{analysis.volume_ratio:.2f}x", volume_color))
 
         # Period performance
@@ -268,7 +268,7 @@ class GenericMetricsFormatter(BasePDFFormatter):
         # Years without dividends
         if analysis.years_without_dividends:
             years_str = ", ".join(str(year) for year in analysis.years_without_dividends)
-            elements.append(self.create_metric_display("Years Without Dividends", years_str, self.colors.RED))
+            elements.append(self.create_metric_display("Years Without Dividends", years_str, self.colors.WARNING_RED))
 
         # Display recent yearly data (last 5 years)
         if analysis.yearly_data:
@@ -299,10 +299,10 @@ class GenericMetricsFormatter(BasePDFFormatter):
     def _get_performance_color(self, change_percent: float) -> object:
         """Get color for performance display."""
         if change_percent > 5:
-            return self.colors.GREEN
+            return self.colors.SUCCESS_GREEN
         elif change_percent > 0:
-            return self.colors.GREEN
+            return self.colors.SUCCESS_GREEN
         elif change_percent > -5:
-            return self.colors.RED
+            return self.colors.WARNING_RED
         else:
-            return self.colors.RED
+            return self.colors.WARNING_RED

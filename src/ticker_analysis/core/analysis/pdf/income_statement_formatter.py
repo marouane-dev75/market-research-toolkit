@@ -175,7 +175,7 @@ class IncomeStatementFormatter(BasePDFFormatter):
 
         # Overall health rating
         if assessment.overall_health_rating != FinancialHealthRating.INSUFFICIENT_DATA:
-            rating_color = self._get_health_rating_color(assessment.overall_health_rating)
+            rating_color = self.get_health_rating_color(assessment.overall_health_rating.value)
             elements.append(self.create_bullet_point(f"Overall Health: {assessment.overall_health_rating.value}", rating_color))
 
             if assessment.overall_health_score is not None:
@@ -198,7 +198,7 @@ class IncomeStatementFormatter(BasePDFFormatter):
 
             for name, rating, score in component_ratings:
                 if rating != FinancialHealthRating.INSUFFICIENT_DATA:
-                    rating_color = self._get_health_rating_color(rating)
+                    rating_color = self.get_health_rating_color(rating.value)
                     score_text = f" ({score:.1f}/10)" if score is not None else ""
                     elements.append(self.create_bullet_point(f"  {name}: {rating.value}{score_text}", rating_color))
 
@@ -207,13 +207,13 @@ class IncomeStatementFormatter(BasePDFFormatter):
             elements.append(Spacer(1, 0.05 * inch))
             elements.append(self.create_subsection_header("Key Strengths:"))
             for strength in assessment.strengths:
-                elements.append(self.create_bullet_point(f"  • {strength}", self.colors.GREEN))
+                elements.append(self.create_bullet_point(f"  • {strength}", self.colors.SUCCESS_GREEN))
 
         if assessment.concerns:
             elements.append(Spacer(1, 0.05 * inch))
             elements.append(self.create_subsection_header("Areas of Concern:"))
             for concern in assessment.concerns:
-                elements.append(self.create_bullet_point(f"  • {concern}", self.colors.RED))
+                elements.append(self.create_bullet_point(f"  • {concern}", self.colors.WARNING_RED))
 
         # Summary
         if assessment.summary:
@@ -238,16 +238,3 @@ class IncomeStatementFormatter(BasePDFFormatter):
             return "Volatile"
         else:
             return trend.value
-
-    def _get_health_rating_color(self, rating: FinancialHealthRating):
-        """Get color for health rating."""
-        if rating == FinancialHealthRating.EXCELLENT:
-            return self.colors.GREEN
-        elif rating == FinancialHealthRating.GOOD:
-            return self.colors.GREEN
-        elif rating == FinancialHealthRating.FAIR:
-            return self.colors.YELLOW
-        elif rating == FinancialHealthRating.POOR:
-            return self.colors.RED
-        else:
-            return self.colors.BLACK
